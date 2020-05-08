@@ -20,6 +20,6 @@ START_TEXT_SIZE = 15
 START_FONT = 'arial black'
 
 # player settings
-PLAYER_START_POS = vec(1,1)
+#PLAYER_START_POS = vec(2, 2)
 
 # mod settings

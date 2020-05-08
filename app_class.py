@@ -3,7 +3,7 @@ import sys
 import copy
 from settings import *
 from player_class import *
-
+from enemy_class import *
 
 pygame.init()
 vec = pygame.math.Vector2
@@ -17,11 +17,15 @@ class App:
         self.state = 'start'
         self.cell_width = MAZE_WIDTH//28
         self.cell_height = MAZE_HEIGHT//30
-        self.player = Player(self, PLAYER_START_POS)
         self.walls = []
         self.coins = []
-
+        self.enemies = []
+        self.e_pos = []
+        self.p_pos = None
         self.load()
+        self.player = Player(self, self.p_pos)
+        self.make_enemies()
+
 
 
     def run(self):
@@ -65,7 +69,17 @@ class App:
                         self.walls.append(vec(xidx, yidx))
                     elif char == "C":
                         self.coins.append(vec(xidx, yidx))
+                    elif char == "P":
+                        self.p_pos = vec(xidx, yidx)
+                    elif char in ["2", "3", "4", "5"]:
+                        self.e_pos.append(vec(xidx, yidx))
+                    elif char == "B":
+                        pygame.draw.rect(self.background, BLACK, (xidx * self.cell_width, yidx * self.cell_height, self.cell_width, self.cell_height))
         #print(self.walls)
+
+    def make_enemies(self):
+        for idx,pos in enumerate(self.e_pos):
+            self.enemies.append(Enemy(self, pos, idx))
 
     def draw_grid(self):
         for x in range(WIDTH//self.cell_width):
@@ -122,16 +136,20 @@ class App:
 
     def playing_update(self):
         self.player.update()
+        for enemy in self.enemies:
+            enemy.update()
 
     def playing_draw(self):
         self.screen.fill(BLACK)
         self.screen.blit(self.background, (TOP_BUTTOM_BUFFER//2, TOP_BUTTOM_BUFFER//2))
         self.draw_coins()
-        self.draw_grid()
+        #self.draw_grid()
         self.draw_text('CURRENT SCORE: {}'.format(self.player.current_score),
                        self.screen, [60,0], 18, WHITE, START_FONT)
         self.draw_text('HIGH SCORE: 0', self.screen, [WIDTH//2 + 60, 0], 18, WHITE, START_FONT)
         self.player.draw()
+        for enemy in self.enemies:
+            enemy.draw()
         pygame.display.update()
 
     def draw_coins(self):
